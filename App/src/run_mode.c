@@ -154,7 +154,9 @@ static void check_last_state_and_change_run_info(run_mechine_data_t *treadmillDa
 program_state_t run_mode(run_mechine_data_t *treadmillData, program_state_t *laststate)
 {
     program_state_t stateReturn;
-    char key = NO_KEY;
+    keypad_info_t key;
+    key.keyName = NO_KEY;
+    key.keypad_state = RELEAS_STATE;
     static power_com_cmd_t cmdSend;
     cmdSend.command = START_RUN;
     cmdSend.length  = 0;
@@ -199,7 +201,6 @@ program_state_t run_mode(run_mechine_data_t *treadmillData, program_state_t *las
         SCREEN_UpdateTime(treadmillData->runTime);
         SCREEN_UpdateIncline(treadmillData->incline);
         SCREEN_UpdateSpeed(treadmillData->speed);
-        SYSTICK_Delay_ms(80);
         /* send data to lower layer */
         cmdSend = POWER_COM_ConverstDataToCmd(treadmillData->speed, treadmillData->incline);
         if(cmdSend.command != 0xFF)
@@ -210,8 +211,8 @@ program_state_t run_mode(run_mechine_data_t *treadmillData, program_state_t *las
     }
 
     /* scan keypad */
-    key = KEYPAD_ScanKey();
-    switch (key)
+    key = KEYPAD_ScanWithCheckHold(500);
+    switch (key.keyName)
     {
         case STOP_KEY:
             SCREEN_Tone();
@@ -259,16 +260,32 @@ program_state_t run_mode(run_mechine_data_t *treadmillData, program_state_t *las
             IsDataChanged = YES;
             stateReturn = RUN;
             break;
-        case PLUS_KEY:  
-            treadmillData->speed += 1;
-            if(treadmillData->speed > 150)
-                treadmillData->speed = 150;
+        case PLUS_KEY:
+            if(key.keypad_state == PRESS_STATE)
+            {
+                treadmillData->speed += 1;
+                if(treadmillData->speed > 150)
+                    treadmillData->speed = 150;
+                else
+                {
+                    IsDataChanged = YES;
+                    SCREEN_Tone();
+                }
+                stateReturn = RUN;
+            }
             else
             {
-                IsDataChanged = YES;
-                SCREEN_Tone();
+                SYSTICK_Delay_ms(20);
+                treadmillData->speed += 1;
+                if(treadmillData->speed > 150)
+                    treadmillData->speed = 150;
+                else
+                {
+                    IsDataChanged = YES;
+                    SCREEN_Tone();
+                }
+                stateReturn = RUN;
             }
-            stateReturn = RUN;
             break;
         case MINUS_KEY:
             treadmillData->speed -= 1;

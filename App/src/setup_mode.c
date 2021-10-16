@@ -2,6 +2,7 @@
 #include "systick.h"
 #include "screen.h"
 #include "setup_mode.h"
+#include "dfplayer.h"
 /*******************************************************************************
  * Variables
  ******************************************************************************/
@@ -97,7 +98,7 @@ program_state_t setup_mode(run_mechine_data_t *treadmillData, program_state_t *l
     {
         case SETUP_KEY:
             SCREEN_Tone();
-            DF_Play(ModeState + 8);
+            //DF_Play(ModeState + 8);
             while(KEYPAD_ScanKey()==SETUP_KEY);
             ModeState += 1;
             /* clear data */

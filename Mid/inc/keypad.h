@@ -24,9 +24,9 @@
 /* key state */
 typedef enum
 {
-    pressState,
-    holdState,
-    releasState
+    PRESS_STATE,
+    HOLD_STATE,
+    RELEAS_STATE
 } keypad_state;
 /* keypad return */
 typedef struct keypad_info

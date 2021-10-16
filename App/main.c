@@ -61,6 +61,8 @@ void seccount()
     TIMER3_Init();
     TIMER3_CallbackInit(seccount);
     TIMER3_Start();
+    POWER_COM_Init();
+    DF_Init(5);
     program_state_t laststate = START;
     program_state_t state = START;
     treadmillData.runEx = 1;

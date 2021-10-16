@@ -22,7 +22,7 @@
 /*******************************************************************************
  * Variable
  ******************************************************************************/
-keypad_state laststate = releasState;
+keypad_state laststate = RELEAS_STATE;
 const char Keypad_Button_Values[4][4] =  {  
                                             {'1', '2', '3', '4'},
                                             {'5', '6', '7', '8'},
@@ -221,7 +221,6 @@ char KEYPAD_ScanKey()
                             key = Keypad_Button_Values[rowVal][Col_4];
                     }
                 }
-
             }
         }
     }
@@ -235,22 +234,39 @@ keypad_info_t KEYPAD_ScanWithCheckHold(uint32_t holdKeytimeOut)
     uint32_t t0 = SYSTICK_GetTick();
     uint32_t t1 = SYSTICK_GetTick();
     keyInfo.keyName = KEYPAD_ScanKey();
-    if(keyInfo.keyName != NO_KEY)
+    switch (laststate)
     {
-        keyTemp = keyInfo.keyName;
-        while(t1 - t0 < holdKeytimeOut)
-        {
+        case HOLD_STATE:
+            /* code */
             keyInfo.keyName = KEYPAD_ScanKey();
-            t1 = SYSTICK_GetTick();
-            if(keyInfo.keyName == NO_KEY)
-                break;
-        }
-        if(t1 - t0 < holdKeytimeOut)
-            keyInfo.keypad_state = pressState;
-        else
-            keyInfo.keypad_state = holdState;
-        keyInfo.keyName = keyTemp;
+            if(keyInfo.keyName != NO_KEY)
+                keyInfo.keypad_state = HOLD_STATE;
+            else
+                keyInfo.keypad_state = RELEAS_STATE;
+            break;
+        
+        default:
+            if(keyInfo.keyName != NO_KEY)
+            {
+                keyTemp = keyInfo.keyName;
+                while(t1 - t0 < holdKeytimeOut)
+                {
+                    keyInfo.keyName = KEYPAD_ScanKey();
+                    t1 = SYSTICK_GetTick();
+                    if(keyInfo.keyName == NO_KEY)
+                        break;
+                }
+                if(t1 - t0 < holdKeytimeOut)
+                    keyInfo.keypad_state = PRESS_STATE;
+                else
+                    keyInfo.keypad_state = HOLD_STATE;
+                keyInfo.keyName = keyTemp;
+            }
+            else
+                keyInfo.keypad_state = RELEAS_STATE;
+            break;
     }
+    laststate = keyInfo.keypad_state;
     return (keyInfo);
 }
 /*******************************************************************************
