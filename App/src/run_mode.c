@@ -158,11 +158,6 @@ program_state_t run_mode(run_mechine_data_t *treadmillData, program_state_t *las
     key.keyName = NO_KEY;
     key.keypad_state = RELEAS_STATE;
     static power_com_cmd_t cmdSend;
-    cmdSend.command = START_RUN;
-    cmdSend.length  = 0;
-    cmdSend.sequence = 0;
-    cmdSend.type    = MASTER_REQUEST_TYPE;
-    cmdSend.buff[0] = XOR_Calculator((uint8_t*)&cmdSend, 0, POWER_COM_CMD_HEADER_SIZE);
     /* Variable to calculate when distances and calorie values change */
     static uint32_t startTickForChangeDistance;
     static uint32_t startTickForChangeCalo;
@@ -170,6 +165,11 @@ program_state_t run_mode(run_mechine_data_t *treadmillData, program_state_t *las
     static uint32_t numberOfChange;
     if(IsThisTheFirstTimeRun == YES)
     {
+        cmdSend.command = START_RUN;
+        cmdSend.length  = 0;
+        cmdSend.sequence = 0;
+        cmdSend.type    = MASTER_REQUEST_TYPE;
+        cmdSend.buff[0] = XOR_Calculator((uint8_t*)&cmdSend, 0, POWER_COM_CMD_HEADER_SIZE);
         waittingScreen(treadmillData);
         Sec = treadmillData->runTime;
         startTickForChangeCalo = 0;
@@ -202,16 +202,17 @@ program_state_t run_mode(run_mechine_data_t *treadmillData, program_state_t *las
         SCREEN_UpdateIncline(treadmillData->incline);
         SCREEN_UpdateSpeed(treadmillData->speed);
         /* send data to lower layer */
-        cmdSend = POWER_COM_ConverstDataToCmd(treadmillData->speed, treadmillData->incline);
+        if(cmdSend.command != START_RUN)
+            cmdSend = POWER_COM_ConverstDataToCmd(treadmillData->speed, treadmillData->incline);
+        else
+            cmdSend.command = 0xFF;
         if(cmdSend.command != 0xFF)
             POWER_COM_SendCmd(&cmdSend, cmdSend.length + 5);
-        //
-        //UART_SendData
         IsDataChanged = NO;
     }
 
     /* scan keypad */
-    key = KEYPAD_ScanWithCheckHold(500);
+    key = KEYPAD_ScanWithCheckHold(HOLD_TIME);
     switch (key.keyName)
     {
         case STOP_KEY:
@@ -261,33 +262,21 @@ program_state_t run_mode(run_mechine_data_t *treadmillData, program_state_t *las
             stateReturn = RUN;
             break;
         case PLUS_KEY:
-            if(key.keypad_state == PRESS_STATE)
-            {
-                treadmillData->speed += 1;
-                if(treadmillData->speed > 150)
-                    treadmillData->speed = 150;
-                else
-                {
-                    IsDataChanged = YES;
-                    SCREEN_Tone();
-                }
-                stateReturn = RUN;
-            }
+            if(key.keypad_state == HOLD_STATE)
+                SYSTICK_Delay_ms(DELAY_IF_HOLD_STATE);
+            treadmillData->speed += 1;
+            if(treadmillData->speed > 150)
+                treadmillData->speed = 150;
             else
             {
-                SYSTICK_Delay_ms(20);
-                treadmillData->speed += 1;
-                if(treadmillData->speed > 150)
-                    treadmillData->speed = 150;
-                else
-                {
-                    IsDataChanged = YES;
-                    SCREEN_Tone();
-                }
-                stateReturn = RUN;
+                IsDataChanged = YES;
+                SCREEN_Tone();
             }
+            stateReturn = RUN;
             break;
         case MINUS_KEY:
+            if(key.keypad_state == HOLD_STATE)
+                SYSTICK_Delay_ms(DELAY_IF_HOLD_STATE);
             treadmillData->speed -= 1;
             if(treadmillData->speed < 10)
                 treadmillData->speed = 10;
@@ -299,6 +288,8 @@ program_state_t run_mode(run_mechine_data_t *treadmillData, program_state_t *las
             stateReturn = RUN;
             break;
         case UP_KEY:
+            if(key.keypad_state == HOLD_STATE)
+                SYSTICK_Delay_ms(DELAY_IF_HOLD_STATE);
             treadmillData->incline += 1;
             if(treadmillData->incline > 12)
                 treadmillData->incline = 12;
@@ -310,6 +301,8 @@ program_state_t run_mode(run_mechine_data_t *treadmillData, program_state_t *las
             stateReturn = RUN;
             break;
         case DOWN_KEY:
+            if(key.keypad_state == HOLD_STATE)
+                SYSTICK_Delay_ms(DELAY_IF_HOLD_STATE);
             treadmillData->incline -= 1;
             if(treadmillData->incline > 12 )
                 treadmillData->incline = 0;

@@ -46,7 +46,7 @@ static void reset_ex_value(run_mechine_data_t *treadmillData);
 program_state_t exercise_mode(run_mechine_data_t *treadmillData, program_state_t *laststate)
 {
     static program_state_t stateReturn;
-    char key;
+    keypad_info_t key;
     /* reset time, incline for new exercise*/
     if(ResetVal == YES)
     {
@@ -73,9 +73,9 @@ program_state_t exercise_mode(run_mechine_data_t *treadmillData, program_state_t
     blinkTimeLed();
     
     /* Scan key */
-    key = KEYPAD_ScanKey();
+    key = KEYPAD_ScanWithCheckHold(500);
     /* Executive */
-    switch (key)
+    switch (key.keyName)
     {
         case EXE_KEY:
             if(treadmillData->runEx >11 || treadmillData->runEx < 3)
@@ -91,6 +91,8 @@ program_state_t exercise_mode(run_mechine_data_t *treadmillData, program_state_t
             stateReturn = EXERCISE_SET;
             break;
         case PLUS_KEY:
+            if(key.keypad_state == HOLD_STATE)
+                SYSTICK_Delay_ms(DELAY_IF_HOLD_STATE);
             treadmillData->runTime += 60;
             if(treadmillData->runTime > MAX_RUN_TIME)
                 treadmillData->runTime = MIN_RUN_TIME;
@@ -99,6 +101,8 @@ program_state_t exercise_mode(run_mechine_data_t *treadmillData, program_state_t
             stateReturn = EXERCISE_SET;
             break;
         case MINUS_KEY:
+            if(key.keypad_state == HOLD_STATE)
+                SYSTICK_Delay_ms(DELAY_IF_HOLD_STATE);
             treadmillData->runTime -= 60;
             if(treadmillData->runTime < MIN_RUN_TIME)
                 treadmillData->runTime = MAX_RUN_TIME;
@@ -107,6 +111,8 @@ program_state_t exercise_mode(run_mechine_data_t *treadmillData, program_state_t
             stateReturn = EXERCISE_SET;
             break;
         case UP_KEY:
+            if(key.keypad_state == HOLD_STATE)
+                SYSTICK_Delay_ms(DELAY_IF_HOLD_STATE);
             treadmillData->runTime += 60;
             if(treadmillData->runTime > MAX_RUN_TIME)
                 treadmillData->runTime = MIN_RUN_TIME;
@@ -115,6 +121,8 @@ program_state_t exercise_mode(run_mechine_data_t *treadmillData, program_state_t
             stateReturn = EXERCISE_SET;
             break;
         case DOWN_KEY:
+            if(key.keypad_state == HOLD_STATE)
+                SYSTICK_Delay_ms(DELAY_IF_HOLD_STATE);
             treadmillData->runTime -= 60;
             if(treadmillData->runTime < MIN_RUN_TIME)
                 treadmillData->runTime = MAX_RUN_TIME;

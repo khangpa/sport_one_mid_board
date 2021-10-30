@@ -5,22 +5,24 @@
  * Definition
  ******************************************************************************/
 /* define key name */
-#define INCLINE_3_KEY       '3'
+#define INCLINE_3_KEY       '1'
 #define INCLINE_6_KEY       '2'
-#define INCLINE_9_KEY       '1'
-#define PLUS_KEY            '4'
-#define MINUS_KEY           '5'
+#define INCLINE_9_KEY       '3'
+#define UP_KEY              '4'
+#define DOWN_KEY            '5'
 #define EXE_KEY             '6'
 #define RUN_KEY             '7'
-#define STOP_KEY            '8'
-#define SETUP_KEY           '9'
-#define UP_KEY              'A'
-#define DOWN_KEY            'B'
-#define SPEED_3_KEY         'C'
-#define SPEED_6_KEY         'D'
-#define SPEED_9_KEY         'E'
+#define STOP_KEY            '9'
+#define SETUP_KEY           'A'
+#define PLUS_KEY            'B'
+#define MINUS_KEY           'C'
+#define SPEED_3_KEY         'F'
+#define SPEED_6_KEY         'E'
+#define SPEED_9_KEY         'D'
 #define NO_KEY            (0xff)
 
+#define DELAY_IF_HOLD_STATE 20
+#define HOLD_TIME           500
 /* key state */
 typedef enum
 {
@@ -42,7 +44,8 @@ typedef enum
     Col_1 = 0,
     Col_2,
     Col_3,
-    Col_4
+    Col_4,
+    Col_5
 } col_index;
 
 typedef enum

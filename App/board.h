@@ -5,14 +5,15 @@
 /* keypad gpio  */
 #define KEYPAD_GPIO       GPIOA
 /* keypad pin */
-#define KEYPAD_COL_1      GPIO_Pin_4
-#define KEYPAD_COL_2      GPIO_Pin_5
-#define KEYPAD_COL_3      GPIO_Pin_6
-#define KEYPAD_COL_4      GPIO_Pin_7
-#define KEYPAD_ROW_1      GPIO_Pin_8
-#define KEYPAD_ROW_2      GPIO_Pin_9
-#define KEYPAD_ROW_3      GPIO_Pin_1
-#define KEYPAD_ROW_4      GPIO_Pin_0
+#define KEYPAD_COL_1      GPIO_Pin_12
+#define KEYPAD_COL_2      GPIO_Pin_0
+#define KEYPAD_COL_3      GPIO_Pin_1
+#define KEYPAD_COL_4      GPIO_Pin_9
+#define KEYPAD_COL_5      GPIO_Pin_8
+#define KEYPAD_ROW_1      GPIO_Pin_7
+#define KEYPAD_ROW_2      GPIO_Pin_6
+#define KEYPAD_ROW_3      GPIO_Pin_5
+#define KEYPAD_ROW_4      GPIO_Pin_4
 /* Power_communicate */
 #define POWER_COM_UART              USART1
 #define POWER_COM_IRQn              USART1_IRQn
@@ -36,7 +37,7 @@
 #define DF_UART_Baudrate            9600
 #define DF_IRQn                     USART2_IRQn
 #define DF_GPIO                     GPIOA
-#define DF_RxPIN                    GPIO_Pin3
+#define DF_RxPIN                    GPIO_Pin_3
 #define DF_TxPIN                    GPIO_Pin_2
 #define DF_GPIO_CLK                 RCC_APB2Periph_GPIOA
 #define DF_CLK                      RCC_APB1Periph_USART2

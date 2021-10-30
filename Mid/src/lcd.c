@@ -282,8 +282,7 @@ void lcd_show_data(unsigned char *puts)
        
     for(i=0;i<1;i++)   
     {   
-        LCD_WriteData(puts[i]);   
-        delay(4);   
+        LCD_WriteData(puts[i]);
     }   
     GPIO_SetBits(HT1621_GPIO,HT1621_CS);                                  //CS = 1;   
 }

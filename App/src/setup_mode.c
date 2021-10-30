@@ -56,7 +56,8 @@ void reset_data_to_default(run_mechine_data_t *treadmillData, uint8_t ModeState)
 program_state_t setup_mode(run_mechine_data_t *treadmillData, program_state_t *laststate)
 {
     program_state_t stateReturn;
-    char key = NO_KEY;
+    keypad_info_t key;
+    key.keyName = NO_KEY;
     /* fist time run */
     if(IsThisTheFirstTimeRun == YES)
     {
@@ -93,8 +94,8 @@ program_state_t setup_mode(run_mechine_data_t *treadmillData, program_state_t *l
     }
 
     /* Scan key */
-    key = KEYPAD_ScanKey();
-    switch(key)
+    key = KEYPAD_ScanWithCheckHold(HOLD_TIME);
+    switch(key.keyName)
     {
         case SETUP_KEY:
             SCREEN_Tone();
@@ -107,24 +108,32 @@ program_state_t setup_mode(run_mechine_data_t *treadmillData, program_state_t *l
             stateReturn = SET_UP;
             break;
         case PLUS_KEY:
+            if(key.keypad_state == HOLD_STATE)
+                SYSTICK_Delay_ms(DELAY_IF_HOLD_STATE);
             SCREEN_Tone();
             increase_val(treadmillData);
             IsDataChanged = YES;
             stateReturn = SET_UP;
             break;
         case MINUS_KEY:
+            if(key.keypad_state == HOLD_STATE)
+                SYSTICK_Delay_ms(DELAY_IF_HOLD_STATE);
             SCREEN_Tone();
             decrease_val(treadmillData);
             IsDataChanged = YES;
             stateReturn = SET_UP;
             break;
         case UP_KEY:
+            if(key.keypad_state == HOLD_STATE)
+                SYSTICK_Delay_ms(DELAY_IF_HOLD_STATE);
             SCREEN_Tone();
             increase_val(treadmillData);
             IsDataChanged = YES;
             stateReturn = SET_UP;
             break;
         case DOWN_KEY:
+            if(key.keypad_state == HOLD_STATE)
+                SYSTICK_Delay_ms(DELAY_IF_HOLD_STATE);
             SCREEN_Tone();
             decrease_val(treadmillData);
             IsDataChanged = YES;
