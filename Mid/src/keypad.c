@@ -15,10 +15,9 @@
 #define NO_ROW      (9)
 
 /* Read write macro */
-#define KEYPAD_READ_ALL_ROW         (GPIO_ReadInputData(KEYPAD_GPIO))
-#define KEYPAD_READ_ROW(x)          (GPIO_ReadInputDataBit(KEYPAD_GPIO, x))
-#define KEYPAD_SET_COL(x)           (GPIO_SetBits(KEYPAD_GPIO,x))
-#define KEYPAD_CLR_COL(x)           (GPIO_ResetBits(KEYPAD_GPIO,x))
+#define KEYPAD_READ_ROW(x)          (GPIO_ReadInputDataBit(KEYPAD_GPIO_ROW, x))
+#define KEYPAD_SET_COL(x)           (GPIO_SetBits(KEYPAD_GPIO_COL,x))
+#define KEYPAD_CLR_COL(x)           (GPIO_ResetBits(KEYPAD_GPIO_COL,x))
 /*******************************************************************************
  * Variable
  ******************************************************************************/
@@ -140,54 +139,55 @@ static uint8_t KEYPAD_RowCheck()
 void KEYPAD_Init()
 {
     GPIO_InitTypeDef GPIO_InitStruce;
-    /* GPIOA Periph clock enable */
+    /* GPIOA, GPIOB Periph clock enable */
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB,ENABLE);
     /* Col init */
     GPIO_InitStruce.GPIO_Pin = KEYPAD_COL_1;
     GPIO_InitStruce.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_InitStruce.GPIO_Mode = GPIO_Mode_Out_PP;
-    GPIO_Init(KEYPAD_GPIO,&GPIO_InitStruce);
+    GPIO_Init(KEYPAD_GPIO_COL,&GPIO_InitStruce);
 
     GPIO_InitStruce.GPIO_Pin = KEYPAD_COL_2;
     GPIO_InitStruce.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_InitStruce.GPIO_Mode = GPIO_Mode_Out_PP;
-    GPIO_Init(KEYPAD_GPIO,&GPIO_InitStruce);
+    GPIO_Init(KEYPAD_GPIO_COL,&GPIO_InitStruce);
 
     GPIO_InitStruce.GPIO_Pin = KEYPAD_COL_3;
     GPIO_InitStruce.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_InitStruce.GPIO_Mode = GPIO_Mode_Out_PP;
-    GPIO_Init(KEYPAD_GPIO,&GPIO_InitStruce);
+    GPIO_Init(KEYPAD_GPIO_COL,&GPIO_InitStruce);
 
     GPIO_InitStruce.GPIO_Pin = KEYPAD_COL_4;
     GPIO_InitStruce.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_InitStruce.GPIO_Mode = GPIO_Mode_Out_PP;
-    GPIO_Init(KEYPAD_GPIO,&GPIO_InitStruce);
+    GPIO_Init(KEYPAD_GPIO_COL,&GPIO_InitStruce);
 
     GPIO_InitStruce.GPIO_Pin = KEYPAD_COL_5;
     GPIO_InitStruce.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_InitStruce.GPIO_Mode = GPIO_Mode_Out_PP;
-    GPIO_Init(KEYPAD_GPIO,&GPIO_InitStruce);
+    GPIO_Init(KEYPAD_GPIO_COL,&GPIO_InitStruce);
 
     /* ROW Init*/
     GPIO_InitStruce.GPIO_Pin = KEYPAD_ROW_1;
     GPIO_InitStruce.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_InitStruce.GPIO_Mode = GPIO_Mode_IPD;
-    GPIO_Init(KEYPAD_GPIO,&GPIO_InitStruce);
+    GPIO_Init(KEYPAD_GPIO_ROW,&GPIO_InitStruce);
 
     GPIO_InitStruce.GPIO_Pin = KEYPAD_ROW_2;
     GPIO_InitStruce.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_InitStruce.GPIO_Mode = GPIO_Mode_IPD;
-    GPIO_Init(KEYPAD_GPIO,&GPIO_InitStruce);
+    GPIO_Init(KEYPAD_GPIO_ROW,&GPIO_InitStruce);
 
     GPIO_InitStruce.GPIO_Pin = KEYPAD_ROW_3;
     GPIO_InitStruce.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_InitStruce.GPIO_Mode = GPIO_Mode_IPD;
-    GPIO_Init(KEYPAD_GPIO,&GPIO_InitStruce);
+    GPIO_Init(KEYPAD_GPIO_ROW,&GPIO_InitStruce);
 
     GPIO_InitStruce.GPIO_Pin = KEYPAD_ROW_4;
     GPIO_InitStruce.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_InitStruce.GPIO_Mode = GPIO_Mode_IPD;
-    GPIO_Init(KEYPAD_GPIO,&GPIO_InitStruce);
+    GPIO_Init(KEYPAD_GPIO_ROW,&GPIO_InitStruce);
 }
 
 /*!

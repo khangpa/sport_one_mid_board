@@ -17,7 +17,6 @@ void UART_PinInit(USART_TypeDef* USARTx)
     GPIO_InitTypeDef GPIO_InitStructure;
     if(USARTx == USART1)
     {
-        GPIO_PinRemapConfig(GPIO_Remap_USART1,ENABLE);
         /*Config USART1 Rx as input floating */
         GPIO_InitStructure.GPIO_Pin = POWER_COM_RxPIN;
         GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
