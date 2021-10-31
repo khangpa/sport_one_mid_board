@@ -5,9 +5,9 @@
 #include "lcd.h" 
 #include "keypad.h"
 #define HT1621_GPIO         GPIOB
-#define HT1621_CS           GPIO_Pin_11
+#define HT1621_CS           GPIO_Pin_1
 #define HT1621_WR           GPIO_Pin_10
-#define HT1621_DAT          GPIO_Pin_1
+#define HT1621_DAT          GPIO_Pin_11
 #define ENABLE_CLOCK_HT1621_GPIO  (RCC->APB2ENR|=(1<<3))
    
 #define  DAT   1    //����   
