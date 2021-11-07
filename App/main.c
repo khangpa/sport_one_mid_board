@@ -69,9 +69,9 @@ int main(void)
     while(1)
     {
         key = KEYPAD_ScanWithCheckHold(500);
-        if(key.keyName == START_RUN)
+        if(key.keyName == RUN_KEY)
             POWER_COM_SendCmd(&startRunCmd, cmdSend.length + 5);
-        if(key.keyName == STOP_RUN)
+        if(key.keyName == STOP_KEY)
             POWER_COM_SendCmd(&stopRunCmd, cmdSend.length + 5);
         if(!QUEUE_Empty(&AndroidCommandQueue))
         {

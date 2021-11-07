@@ -172,12 +172,6 @@ void USART2_IRQHandler(void)
   * @param  None
   * @retval None
   */
-void USART3_IRQHandler(void)
-{
-    USART_ClearITPendingBit(USART3,USART_IT_RXNE);
-    if(UART3_CallbackFunc != NULL)
-        UART3_CallbackFunc();
-}
 
 
 /******************************************************************************/
