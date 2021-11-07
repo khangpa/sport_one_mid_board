@@ -7,7 +7,7 @@
 /*******************************************************************************
 * Definition
 *******************************************************************************/
-UART_HandleTypeDef    UART3_CallbackFunc = NULL;
+UART_HandleTypeDef    UART1_CallbackFunc = NULL;
 UART_HandleTypeDef    UART2_CallbackFunc = NULL;
 /*******************************************************************************
 * Code
@@ -89,7 +89,7 @@ void UART_Init(USART_TypeDef* USARTx, u32 baudrate, u16 mode)
 void UART_CallbackInit(USART_TypeDef* USARTx, UART_HandleTypeDef pHandle)
 {
     if(USARTx == POWER_COM_UART)
-        UART3_CallbackFunc = pHandle;
+        UART1_CallbackFunc = pHandle;
     if(USARTx == ANDROID_UART)
         UART2_CallbackFunc = pHandle;
 }

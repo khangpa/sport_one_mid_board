@@ -27,7 +27,7 @@
 #include "stm32f10x_usart.h"
 #include "stm32f10x_tim.h"
 #include "uart.h"
-extern UART_HandleTypeDef     UART3_CallbackFunc;
+extern UART_HandleTypeDef     UART1_CallbackFunc;
 extern UART_HandleTypeDef     UART2_CallbackFunc;
 //extern TIMER_HandlerTypedef   TIMER2_CallbackFunc;
 /** @addtogroup STM32F10x_StdPeriph_Template
@@ -156,12 +156,14 @@ void USART1_IRQHandler(void)
 {
   USART_ClearITPendingBit(USART1,USART_IT_RXNE);
   USART_ClearFlag(USART1,USART_FLAG_RXNE);
+  if(UART1_CallbackFunc != NULL)
+        UART1_CallbackFunc();
 }
 
 void USART2_IRQHandler(void)
 {
   USART_ClearITPendingBit(USART2,USART_IT_RXNE);
-  USART_ClearFlag(USART1,USART_FLAG_RXNE);
+  USART_ClearFlag(USART2,USART_FLAG_RXNE);
     if(UART2_CallbackFunc != NULL)
         UART2_CallbackFunc();
 }
