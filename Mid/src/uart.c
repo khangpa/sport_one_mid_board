@@ -30,9 +30,9 @@ void UART_PinInit(USART_TypeDef* USARTx)
     }
     else if(USARTx == USART2)
     {
-        GPIO_InitStructure.GPIO_Pin = DF_TxPIN;
+        GPIO_InitStructure.GPIO_Pin = ANDROID_TxPIN;
         GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
-        GPIO_Init(DF_GPIO, &GPIO_InitStructure);
+        GPIO_Init(ANDROID_GPIO, &GPIO_InitStructure);
     }
 }
 
@@ -50,9 +50,11 @@ void UART_ClockInit(USART_TypeDef* USARTx)
     else if(USARTx == USART2)
     {
         /*Enable GPIO clock*/
-        //RCC_APB2PeriphClockCmd(DF_GPIO_CLK, ENABLE);
+        RCC_APB2PeriphClockCmd(ANDROID_GPIO_CLK, ENABLE);
+        /*Enable AFIO clock*/
+        RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
         /*Enable UART clock*/
-        RCC_APB1PeriphClockCmd(DF_CLK, ENABLE);
+        RCC_APB1PeriphClockCmd(ANDROID_CLK, ENABLE);
     }
 }
 
@@ -75,10 +77,10 @@ void UART_Init(USART_TypeDef* USARTx, u32 baudrate, u16 mode)
     USART_Init(USARTx, &USART_InitStructure);
 
     /* Enable USARTx Receive interrupts */
-   // USART_ITConfig(USARTx, USART_IT_RXNE, ENABLE);
+    USART_ITConfig(USARTx, USART_IT_RXNE, ENABLE);
 
     /* NVIC Config */
-   // NVIC_EnableIRQ(POWER_COM_IRQn);
+    NVIC_EnableIRQ(ANDROID_IRQn);
     /*Enable UARTx*/
     USART_Cmd(USARTx, ENABLE);
 }
@@ -88,6 +90,8 @@ void UART_CallbackInit(USART_TypeDef* USARTx, UART_HandleTypeDef pHandle)
 {
     if(USARTx == POWER_COM_UART)
         UART3_CallbackFunc = pHandle;
+    if(USARTx == ANDROID_UART)
+        UART2_CallbackFunc = pHandle;
 }
 
 

@@ -12,85 +12,74 @@
  * Revision:         $Revision: xxx $
  * Last Changed:     $Date: xxx $
  */
-#include "safety_checking.h"
 #include "keypad.h"
 #include "stdint.h"
 #include "common.h"
 #include "systick.h"
-#include "start_mode.h"
-#include "setup_mode.h"
-#include "exercise_mode.h"
-#include "run_mode.h"
 #include "board.h"
-#include "stop_mode.h"
-#include "stm32f10x_gpio.h"
-#include "screen.h"
 #include "uart.h"
-#include "timer3.h"
 #include "power_communicate.h"
-#include "stm32f10x_usart.h"
-#include "dfplayer.h"
-
+#include "android.h"
+#include "queue.h"
+#include "xor.h"
 /*******************************************************************************
 * Variable
 *******************************************************************************/
+extern QUEUEx_t AndroidCommandQueue;
 run_mechine_data_t treadmillData;
-volatile uint8_t  WarningFlag = 0;
-volatile int sec = 3;
 /*******************************************************************************
  * Definition
  ******************************************************************************/
 /*******************************************************************************
 * Private func
 *******************************************************************************/
-void seccount()
-{
-    sec--;
-    WarningFlag = 1;
-}
 /*******************************************************************************
  * Code
  ******************************************************************************/
- int main(void)
+int main(void)
 {
-    SYSTICK_Init();
-    SCREEN_Init();         
-    KEYPAD_Init();
-    SCREEN_Clear();
-    SCREEN_MiddleNumber(sec);
-    TIMER3_Init();
-    TIMER3_CallbackInit(seccount);
-    TIMER3_Start();
-    POWER_COM_Init();
-    DF_Init(5);
-    program_state_t laststate = START;
-    program_state_t state = START;
+    keypad_info_t key;
+    power_com_cmd_t startRunCmd;
+    power_com_cmd_t stopRunCmd;
+    power_com_cmd_t cmdSend;
+    android_cmd_t android_cmd;
+    startRunCmd.command = START_RUN;
+    startRunCmd.length  = 0;
+    startRunCmd.sequence = 0;
+    startRunCmd.type    = MASTER_REQUEST_TYPE;
+    startRunCmd.buff[0] = XOR_Calculator((uint8_t*)&cmdSend, 0, POWER_COM_CMD_HEADER_SIZE);
+
+    stopRunCmd.command = STOP_RUN;
+    stopRunCmd.length  = 0;
+    stopRunCmd.sequence = 0;
+    stopRunCmd.type    = MASTER_REQUEST_TYPE;
+    stopRunCmd.buff[0] = XOR_Calculator((uint8_t*)&cmdSend, 0, POWER_COM_CMD_HEADER_SIZE);
+
+    android_cmd.speed = 0;
+    android_cmd.incline = 0;
     treadmillData.runEx = 1;
     treadmillData.speed = 0;
     treadmillData.runTime = 0;
     treadmillData.distance = 0;
     treadmillData.incline = 0;
+    SYSTICK_Init();      
+    KEYPAD_Init();
+    POWER_COM_Init();
+    ANDROID_Init();
     while(1)
     {
-        switch (state)
+        key = KEYPAD_ScanWithCheckHold(500);
+        if(key.keyName == START_RUN)
+            POWER_COM_SendCmd(&startRunCmd, cmdSend.length + 5);
+        if(key.keyName == STOP_RUN)
+            POWER_COM_SendCmd(&stopRunCmd, cmdSend.length + 5);
+        if(!QUEUE_Empty(&AndroidCommandQueue))
         {
-            case START:
-                state = start_mode(&treadmillData,&laststate);
-                break;
-            case RUN:
-                state = run_mode(&treadmillData,&laststate);
-                break;
-            case STOP:
-                state = stop_mode(&treadmillData,&laststate);
-                break;
-            case EXERCISE_SET:
-                state = exercise_mode(&treadmillData,&laststate);
-                break;
-            case SET_UP:
-                state = setup_mode(&treadmillData,&laststate);
-                break;
-            default:
-                break;
+            QUEUE_Get(&AndroidCommandQueue, (uint8_t *)&android_cmd);
+            cmdSend = POWER_COM_ConverstDataToCmd(android_cmd.speed , android_cmd.incline);
+            if(cmdSend.command != 0xFF)
+                POWER_COM_SendCmd(&cmdSend, cmdSend.length + 5);
         }
     }
+    
 }
