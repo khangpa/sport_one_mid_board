@@ -19,7 +19,7 @@ void UART_PinInit(USART_TypeDef* USARTx)
     {
         /*Config USART1 Rx as input floating */
         GPIO_InitStructure.GPIO_Pin = POWER_COM_RxPIN;
-        GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
+        GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
         GPIO_Init(POWER_COM_GPIO, &GPIO_InitStructure);
         /*Config USART1 Tx as alternate function pp*/
         GPIO_InitStructure.GPIO_Pin = POWER_COM_TxPIN;
@@ -31,13 +31,13 @@ void UART_PinInit(USART_TypeDef* USARTx)
     {
         /*Config USART1 Rx as input floating */
         GPIO_InitStructure.GPIO_Pin = ANDROID_RxPIN;
-        GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
+        GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
         GPIO_Init(POWER_COM_GPIO, &GPIO_InitStructure);
         /*Config USART1 Tx as alternate function pp*/
         GPIO_InitStructure.GPIO_Pin = ANDROID_TxPIN;
         GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
         GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
-        GPIO_Init(POWER_COM_GPIO, &GPIO_InitStructure);
+        GPIO_Init(ANDROID_GPIO, &GPIO_InitStructure);
     }
 }
 

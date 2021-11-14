@@ -219,8 +219,8 @@ int main(void)
     {
         keypad_proc();
         android_proc();
-        /* POWER_COM_SendCmd(&startRunCmd, startRunCmd.length +5);
-        ANDROID_SendCmd(&androidCmd,2); */
+        //POWER_COM_SendCmd(&startRunCmd, startRunCmd.length +5);
+        //ANDROID_SendCmd(&androidCmd,2);
     }
 }
 

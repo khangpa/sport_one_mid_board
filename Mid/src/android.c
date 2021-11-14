@@ -30,7 +30,7 @@ uint32_t ANDROID_Init()
 	QUEUE_Init(&AndroidCommandQueue, (u8*)AndroidCommandBuff,\
                 ANDROID_CMD_BUFF_MAX_SIZE, sizeof(android_cmd_t));
 	UART_Init(ANDROID_UART,9600, USART_Mode_Tx|USART_Mode_Rx);
-    USART_Cmd(POWER_COM_UART, ENABLE);
+    USART_Cmd(ANDROID_UART, ENABLE);
     return 0;
 }
 
