@@ -17,7 +17,7 @@ static void Android_CallbackHandle()
     
     revByte = UART_GetData(ANDROID_UART);
     revBuff[revByteCount++] = revByte;
-    if(revByteCount >= 3)
+    if(revByteCount >= 2)
     {
         QUEUE_Push(&AndroidCommandQueue, revBuff);
         revByteCount = 0;
@@ -30,11 +30,17 @@ uint32_t ANDROID_Init()
 	QUEUE_Init(&AndroidCommandQueue, (u8*)AndroidCommandBuff,\
                 ANDROID_CMD_BUFF_MAX_SIZE, sizeof(android_cmd_t));
 	UART_Init(ANDROID_UART,9600, USART_Mode_Tx|USART_Mode_Rx);
-    USART_Cmd(ANDROID_UART,ENABLE);
+    USART_Cmd(POWER_COM_UART, ENABLE);
     return 0;
 }
 
 void ANDROID_DeInit()
 {
     USART_Cmd(ANDROID_UART,DISABLE);
+}
+
+uint32_t ANDROID_SendCmd(android_cmd_t *cmd, uint32_t cmdSize)
+{
+    UART_SendData(ANDROID_UART,(uint8_t *)cmd,cmdSize);
+    return 0;
 }

@@ -17,7 +17,6 @@ void UART_PinInit(USART_TypeDef* USARTx)
     GPIO_InitTypeDef GPIO_InitStructure;
     if(USARTx == USART1)
     {
-        GPIO_PinRemapConfig(GPIO_Remap_USART1,ENABLE);
         /*Config USART1 Rx as input floating */
         GPIO_InitStructure.GPIO_Pin = POWER_COM_RxPIN;
         GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
@@ -30,9 +29,15 @@ void UART_PinInit(USART_TypeDef* USARTx)
     }
     else if(USARTx == USART2)
     {
-        GPIO_InitStructure.GPIO_Pin = ANDROID_TxPIN;
+        /*Config USART1 Rx as input floating */
+        GPIO_InitStructure.GPIO_Pin = ANDROID_RxPIN;
         GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
-        GPIO_Init(ANDROID_GPIO, &GPIO_InitStructure);
+        GPIO_Init(POWER_COM_GPIO, &GPIO_InitStructure);
+        /*Config USART1 Tx as alternate function pp*/
+        GPIO_InitStructure.GPIO_Pin = ANDROID_TxPIN;
+        GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+        GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
+        GPIO_Init(POWER_COM_GPIO, &GPIO_InitStructure);
     }
 }
 
