@@ -12,6 +12,10 @@
  * Revision:         $Revision: xxx $
  * Last Changed:     $Date: xxx $
  */
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+
 #include "keypad.h"
 #include "stdint.h"
 #include "common.h"
@@ -35,19 +39,68 @@ uint32_t run_flag = 0;
 /*******************************************************************************
  * Definition
  ******************************************************************************/
+typedef enum cmd_type
+{
+    start = 0,
+    stop,
+    set,
+    error
+} cmd_type_t;
+typedef struct main_cmd
+{
+    cmd_type_t cmd;
+    uint32_t speed;
+    uint32_t incline;
+} main_cmd_t;
 /*******************************************************************************
 * Private func
 *******************************************************************************/
+power_com_cmd_t convert_android_to_power_cmd(android_cmd_t androidCmd);
+android_cmd_t convert_power_cmd_to_android(power_com_cmd_t powerCmd);
+void android_proc();
+void keypad_proc();
+void clear_data();
 /*******************************************************************************
  * Code
  ******************************************************************************/
+
+
+int main(void)
+{
+    startRunCmd.command = START_RUN;
+    startRunCmd.length  = 0;
+    startRunCmd.sequence = 0;
+    startRunCmd.type    = MASTER_REQUEST_TYPE;
+    startRunCmd.buff[0] = XOR_Calculator((uint8_t*)&cmdSend, 0, POWER_COM_CMD_HEADER_SIZE);
+
+    stopRunCmd.command = STOP_RUN;
+    stopRunCmd.length  = 0;
+    stopRunCmd.sequence = 0;
+    stopRunCmd.type    = MASTER_REQUEST_TYPE;
+    stopRunCmd.buff[0] = XOR_Calculator((uint8_t*)&cmdSend, 0, POWER_COM_CMD_HEADER_SIZE);
+
+    treadmillData.runEx = 0;
+    treadmillData.speed = 0;
+    treadmillData.runTime = 0;
+    treadmillData.distance = 0;
+    treadmillData.incline = 0;
+    SYSTICK_Init();
+    KEYPAD_Init();
+    POWER_COM_Init();
+    ANDROID_Init();
+    while(1)
+    {
+        keypad_proc();
+        android_proc();
+    }
+}
+
 void clear_data()
 {
     treadmillData.incline = 0;
     treadmillData.speed = 0;
-    androidCmd.speed = 0;
-    androidCmd.incline = 0;
 }
+
 void keypad_proc()
 {
     static keypad_info_t key;
@@ -56,19 +109,15 @@ void keypad_proc()
     switch (key.keyName)
     {
         case RUN_KEY:
-            androidCmd.speed = 0xff;
-            ANDROID_SendCmd(&androidCmd, sizeof(androidCmd));
+            ANDROID_SendCmd("start\n", 6);
             POWER_COM_SendCmd(&startRunCmd, startRunCmd.length + 5);
             // default val:
-            androidCmd.speed = 20;
             treadmillData.speed = 20;
-            androidCmd.incline = 0;
             treadmillData.incline = 0;
             run_flag = 1;
             break;
         case STOP_KEY:
-            androidCmd.speed = 0xfe;
-            ANDROID_SendCmd(&androidCmd, sizeof(androidCmd));
+            ANDROID_SendCmd("end\n", 4);
             POWER_COM_SendCmd(&stopRunCmd, stopRunCmd.length + 5);
             clear_data();
             run_flag = 0;
@@ -142,10 +191,10 @@ void keypad_proc()
         cmdSend = POWER_COM_ConverstDataToCmd(treadmillData.speed ,treadmillData.incline);
         if(cmdSend.command != 0xFF)
         {
+            android_cmd_t androidCmdResend;
             POWER_COM_SendCmd(&cmdSend, cmdSend.length + 5);
-            androidCmd.speed = treadmillData.speed;
-            androidCmd.incline = treadmillData.incline;
-            ANDROID_SendCmd(&androidCmd, sizeof(androidCmd));
+            androidCmdResend = convert_power_cmd_to_android(cmdSend);
+            ANDROID_SendCmd((char *)&androidCmdResend, strlen(androidCmdResend.cmd));
         }
         IsDataChanged = NO;
     }
@@ -155,72 +204,98 @@ void android_proc()
 {
     if(!QUEUE_Empty(&AndroidCommandQueue))
     {
+        android_cmd_t androidCmdResend;
+        memset(&androidCmdResend, '\0', sizeof(androidCmdResend));
         QUEUE_Get(&AndroidCommandQueue, (uint8_t *)&androidCmd);
-        if(androidCmd.speed == 0xFF)
+        cmdSend = convert_android_to_power_cmd(androidCmd);
+        switch (cmdSend.command)
         {
-            POWER_COM_SendCmd(&startRunCmd, startRunCmd.length + 5);
-            androidCmd.speed = 20;
-            androidCmd.incline = 0;
+        case START_RUN:
+            run_flag = 1;
             treadmillData.speed = 20;
             treadmillData.incline = 0;
-            run_flag = 1;
-        }
-        else if(androidCmd.speed == 0xFE)
-        {
-            POWER_COM_SendCmd(&stopRunCmd, startRunCmd.length + 5);
-            clear_data();
+            break;
+        case STOP_RUN:
             run_flag = 0;
+            treadmillData.speed = 0;
+            treadmillData.incline = 0;
+            break;
+        default:
+            break;
         }
-        else if(run_flag && (androidCmd.speed != 0xFF))
+        if(cmdSend.command != 0xFF)
         {
-            if(androidCmd.speed > 150)
-                androidCmd.speed = 150;
-            if(androidCmd.speed < 10)
-                androidCmd.speed = 10;
-            if(androidCmd.incline > 12)
-                androidCmd.speed = 12;
-            treadmillData.speed = androidCmd.speed;
-            treadmillData.incline = androidCmd.incline;
-            cmdSend = POWER_COM_ConverstDataToCmd(androidCmd.speed ,androidCmd.incline);
-            if(cmdSend.command != 0xFF)
+            if((run_flag == 1) || (cmdSend.command == STOP_RUN))
+            {
                 POWER_COM_SendCmd(&cmdSend, cmdSend.length + 5);
+                androidCmdResend = convert_power_cmd_to_android(cmdSend);
+                ANDROID_SendCmd((char *)&androidCmdResend, strlen(androidCmdResend.cmd));
+            }
         }
-        /* resend raw message was received to android board */
-        ANDROID_SendCmd(&androidCmd, sizeof androidCmd);
+        else
+            ANDROID_SendCmd("error\n", strlen("error\n"));
     }
 }
 
-int main(void)
+power_com_cmd_t convert_android_to_power_cmd(android_cmd_t androidCmd)
 {
-    startRunCmd.command = START_RUN;
-    startRunCmd.length  = 0;
-    startRunCmd.sequence = 0;
-    startRunCmd.type    = MASTER_REQUEST_TYPE;
-    startRunCmd.buff[0] = XOR_Calculator((uint8_t*)&cmdSend, 0, POWER_COM_CMD_HEADER_SIZE);
-
-    stopRunCmd.command = STOP_RUN;
-    stopRunCmd.length  = 0;
-    stopRunCmd.sequence = 0;
-    stopRunCmd.type    = MASTER_REQUEST_TYPE;
-    stopRunCmd.buff[0] = XOR_Calculator((uint8_t*)&cmdSend, 0, POWER_COM_CMD_HEADER_SIZE);
-
-    androidCmd.speed = 0;
-    androidCmd.incline = 0;
-    treadmillData.runEx = 0;
-    treadmillData.speed = 0;
-    treadmillData.runTime = 0;
-    treadmillData.distance = 0;
-    treadmillData.incline = 0;
-    SYSTICK_Init();
-    KEYPAD_Init();
-    POWER_COM_Init();
-    ANDROID_Init();
-    while(1)
+    power_com_cmd_t cmdRet;
+    cmdRet.command = 0xFF;
+    char *incPtr = NULL;
+    if(androidCmd.cmd[0] == 's')
     {
-        keypad_proc();
-        android_proc();
-        //POWER_COM_SendCmd(&startRunCmd, startRunCmd.length +5);
-        //ANDROID_SendCmd(&androidCmd,2);
+        if(androidCmd.cmd[1] == 't')
+        {
+            if(androidCmd.cmd[2] == 'a')
+            {
+                POWER_COM_ConverstDataToCmd(20 ,0);
+                cmdRet = startRunCmd;
+            }
+        }
     }
+    else if(androidCmd.cmd[0] == 'e')
+    {
+        if(androidCmd.cmd[1] == 'n')
+        {
+            if(androidCmd.cmd[2] == 'd')
+            {
+                POWER_COM_ConverstDataToCmd(0 ,0);
+                cmdRet = stopRunCmd;
+            }
+        }
+    }
+    else if(run_flag == 1)
+    {
+        treadmillData.speed = (uint32_t) strtoul(androidCmd.cmd, &incPtr, 10);
+        treadmillData.incline = (uint32_t) strtoul(incPtr + 1 , (char **)NULL, 10);
+        if(treadmillData.speed > 150)
+            treadmillData.speed = 150;
+
+        if(treadmillData.speed < 10)
+            treadmillData.speed = 10;
+
+        if(treadmillData.incline > 12)
+            treadmillData.incline = 12;
+
+        cmdRet = POWER_COM_ConverstDataToCmd((uint8_t)treadmillData.speed ,(uint8_t)treadmillData.incline);
+    }
+    return cmdRet;
 }
 
+android_cmd_t convert_power_cmd_to_android(power_com_cmd_t powerCmd)
+{
+    android_cmd_t cmdRet;
+    memset(&cmdRet, '\0', sizeof(cmdRet));
+    if(powerCmd.command == START_RUN)
+        strcat(cmdRet.cmd,"start\n");
+    else if(powerCmd.command == STOP_RUN)
+        strcat(cmdRet.cmd,"end\n");
+    else
+    {
+        sprintf(cmdRet.cmd,"%d",treadmillData.speed);
+        strcat(cmdRet.cmd,";");
+        sprintf(cmdRet.cmd + strlen(cmdRet.cmd),"%d",treadmillData.incline);
+        strcat(cmdRet.cmd,"\n");
+    }
+    return cmdRet;
+}

@@ -23,8 +23,8 @@ typedef struct
     uint32_t distance;
     uint32_t calo;
     uint32_t runTime;
-    uint8_t runEx;
-    uint8_t incline;
+    uint32_t runEx;
+    uint32_t incline;
 } run_mechine_data_t;
 
 /* define default value and maximum value of data */
