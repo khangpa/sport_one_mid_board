@@ -15,7 +15,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-
+#include <stdio.h>
 #include "keypad.h"
 #include "stdint.h"
 #include "common.h"
@@ -207,6 +207,7 @@ void android_proc()
         android_cmd_t androidCmdResend;
         memset(&androidCmdResend, '\0', sizeof(androidCmdResend));
         QUEUE_Get(&AndroidCommandQueue, (uint8_t *)&androidCmd);
+        printf("queue get: %s\r\n",androidCmd.cmd);
         cmdSend = convert_android_to_power_cmd(androidCmd);
         switch (cmdSend.command)
         {
@@ -230,10 +231,14 @@ void android_proc()
                 POWER_COM_SendCmd(&cmdSend, cmdSend.length + 5);
                 androidCmdResend = convert_power_cmd_to_android(cmdSend);
                 ANDROID_SendCmd((char *)&androidCmdResend, strlen(androidCmdResend.cmd));
+                printf("send cmd to android: %s\r\n",androidCmdResend.cmd);
             }
         }
         else
+        {
             ANDROID_SendCmd("error\n", strlen("error\n"));
+            printf("send cmd to android: error");
+        }
     }
 }
 

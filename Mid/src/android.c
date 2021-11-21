@@ -22,12 +22,13 @@ static void Android_CallbackHandle()
     static uint8_t revByteCount = 0;
     static uint8_t revBuff[ANDROID_CMD_MAX_SIZE];
     char revByte = 0;
-    
     revByte = UART_GetData(ANDROID_UART);
+    printf("recive byte: %c\r\n", revByte);
     revBuff[revByteCount++] = revByte;
     if((revByteCount >= ANDROID_CMD_MAX_SIZE) || revByte == '\n')
     {
         QUEUE_Push(&AndroidCommandQueue, revBuff);
+        printf("queue push: %s\r\n", revBuff);
         memset(revBuff, '\0', ANDROID_CMD_MAX_SIZE);
         revByteCount = 0;
     }
