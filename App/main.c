@@ -71,13 +71,13 @@ int main(void)
     startRunCmd.length  = 0;
     startRunCmd.sequence = 0;
     startRunCmd.type    = MASTER_REQUEST_TYPE;
-    startRunCmd.buff[0] = XOR_Calculator((uint8_t*)&cmdSend, 0, POWER_COM_CMD_HEADER_SIZE);
+    startRunCmd.buff[0] = XOR_Calculator((uint8_t*)&startRunCmd, 0, POWER_COM_CMD_HEADER_SIZE);
 
     stopRunCmd.command = STOP_RUN;
     stopRunCmd.length  = 0;
     stopRunCmd.sequence = 0;
     stopRunCmd.type    = MASTER_REQUEST_TYPE;
-    stopRunCmd.buff[0] = XOR_Calculator((uint8_t*)&cmdSend, 0, POWER_COM_CMD_HEADER_SIZE);
+    stopRunCmd.buff[0] = XOR_Calculator((uint8_t*)&stopRunCmd, 0, POWER_COM_CMD_HEADER_SIZE);
 
     treadmillData.runEx = 0;
     treadmillData.speed = 0;
