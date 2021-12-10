@@ -63,8 +63,6 @@ void clear_data();
 /*******************************************************************************
  * Code
  ******************************************************************************/
-
-
 int main(void)
 {
     startRunCmd.command = START_RUN;
@@ -195,7 +193,14 @@ void keypad_proc()
             POWER_COM_SendCmd(&cmdSend, cmdSend.length + 5);
             androidCmdResend = convert_power_cmd_to_android(cmdSend);
             ANDROID_SendCmd((char *)&androidCmdResend, strlen(androidCmdResend.cmd));
+            #ifdef DEBUG
+            printf("treadmillData speed : %d     Incline: %d\r\n", treadmillData.speed, treadmillData.incline);
+            printf("androidCmdResend : %s\r\n", androidCmdResend.cmd);
+            #endif
         }
+        #ifdef DEBUG
+        printf("IsDataChanged : %d\r\n", IsDataChanged);
+        #endif
         IsDataChanged = NO;
     }
 }
@@ -207,8 +212,11 @@ void android_proc()
         android_cmd_t androidCmdResend;
         memset(&androidCmdResend, '\0', sizeof(androidCmdResend));
         QUEUE_Get(&AndroidCommandQueue, (uint8_t *)&androidCmd);
-        printf("queue get: %s\r\n",androidCmd.cmd);
         cmdSend = convert_android_to_power_cmd(androidCmd);
+        #ifdef DEBUG
+            printf("queue get: %s\r\n",androidCmd.cmd);
+            printf("treadmillData speed : %d     Incline: %d\r\n", treadmillData.speed, treadmillData.incline);
+        #endif
         switch (cmdSend.command)
         {
         case START_RUN:
@@ -231,13 +239,20 @@ void android_proc()
                 POWER_COM_SendCmd(&cmdSend, cmdSend.length + 5);
                 androidCmdResend = convert_power_cmd_to_android(cmdSend);
                 ANDROID_SendCmd((char *)&androidCmdResend, strlen(androidCmdResend.cmd));
+                #ifdef DEBUG
                 printf("send cmd to android: %s\r\n",androidCmdResend.cmd);
+                printf("treadmillData speed : %d     Incline: %d\r\n", treadmillData.speed, treadmillData.incline);
+                #endif
             }
         }
         else
         {
             ANDROID_SendCmd("error\n", strlen("error\n"));
+            #ifdef DEBUG
+            printf("runflag = %d\r\n",run_flag);
+            printf("cmdSend.command = %d\r\n", cmdSend.command);
             printf("send cmd to android: error");
+            #endif
         }
     }
 }
@@ -274,13 +289,13 @@ power_com_cmd_t convert_android_to_power_cmd(android_cmd_t androidCmd)
         treadmillData.speed = (uint32_t) strtoul(androidCmd.cmd, &incPtr, 10);
         treadmillData.incline = (uint32_t) strtoul(incPtr + 1 , (char **)NULL, 10);
         if(treadmillData.speed > 150)
-            treadmillData.speed = 150;
+            treadmillData.speed = 10;
 
         if(treadmillData.speed < 10)
             treadmillData.speed = 10;
 
         if(treadmillData.incline > 12)
-            treadmillData.incline = 12;
+            treadmillData.incline = 0;
 
         cmdRet = POWER_COM_ConverstDataToCmd((uint8_t)treadmillData.speed ,(uint8_t)treadmillData.incline);
     }

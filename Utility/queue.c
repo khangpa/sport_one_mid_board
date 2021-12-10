@@ -15,7 +15,7 @@
  * @brief functions QUEUE_Init.
  *
  */
-void QUEUE_Init(QUEUEx_t *q, u8* buffer, u8 queue_size, u8 element_size)
+void QUEUE_Init(QUEUEx_t *q, uint8_t* buffer, uint8_t queue_size, uint8_t element_size)
 {
     q->in = 0;
     q->out = 0;
@@ -29,7 +29,7 @@ void QUEUE_Init(QUEUEx_t *q, u8* buffer, u8 queue_size, u8 element_size)
  * @brief functions QUEUE_Push.
  *
  */
-u8 QUEUE_Push(QUEUEx_t *q,u8* data)
+uint8_t QUEUE_Push(QUEUEx_t *q, uint8_t* data)
 {
     if(QUEUE_Count(q)>=q->queue_size)
     {       
@@ -47,7 +47,7 @@ u8 QUEUE_Push(QUEUEx_t *q,u8* data)
         q->in=0;
     }
 
-    memcpy((u8*)&(q->p[q->in]),(u8*)data,q->element_size);
+    memcpy((uint8_t*)&(q->p[q->in]),(uint8_t*)data,q->element_size);
     q->in +=q->element_size;
 
     q->count++;
@@ -59,7 +59,7 @@ u8 QUEUE_Push(QUEUEx_t *q,u8* data)
  * @brief functions QUEUE_Get.
  *
  */
-u8 QUEUE_Get(QUEUEx_t *q, u8* buffer)
+uint8_t QUEUE_Get(QUEUEx_t *q, uint8_t* buffer)
 {
     if(QUEUE_Count(q))
     {
@@ -68,7 +68,7 @@ u8 QUEUE_Get(QUEUEx_t *q, u8* buffer)
             q->out=0;
         }
 
-        memcpy((u8*)buffer,(u8*)&(q->p[q->out]),q->element_size);
+        memcpy((uint8_t*)buffer,(uint8_t*)&(q->p[q->out]),q->element_size);
         q->out+=q->element_size;        
         q->count--;
 
@@ -82,7 +82,7 @@ u8 QUEUE_Get(QUEUEx_t *q, u8* buffer)
  * @brief functions QUEUE_Empty.
  *
  */
-u8 QUEUE_Empty(QUEUEx_t *q)
+uint8_t QUEUE_Empty(QUEUEx_t *q)
 {
     if(q->count)
     {
@@ -95,7 +95,7 @@ u8 QUEUE_Empty(QUEUEx_t *q)
  * @brief functions QUEUE_Count.
  *
  */
-u8 QUEUE_Count(QUEUEx_t *q)
+uint8_t QUEUE_Count(QUEUEx_t *q)
 {
     return q->count;
 }

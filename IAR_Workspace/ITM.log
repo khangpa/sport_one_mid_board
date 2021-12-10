@@ -1,1 +1,57 @@
-test_SWO
+recive byte: s
+recive byte: t
+recive byte: a
+recive byte: r
+recive byte: t
+recive byte: 
+
+queue push: start
+
+queue get: start
+
+treadmillData speed : 0     Incline: 0
+send cmd to android: start
+
+treadmillData speed : 20     Incline: 0
+recive byte: 3
+recive byte: 0
+recive byte: ;
+recive byte: 9
+recive byte: 
+
+queue push: 30;9
+
+queue get: 30;9
+
+treadmillData speed : 30     Incline: 9
+send cmd to android: 30;9
+
+treadmillData speed : 30     Incline: 9
+recive byte: 3
+recive byte: 0
+recive byte: ;
+recive byte: 9
+recive byte: 
+
+queue push: 30;9
+
+queue get: 30;9
+
+treadmillData speed : 30     Incline: 9
+send cmd to android: 30;9
+
+treadmillData speed : 30     Incline: 9
+recive byte: 3
+recive byte: 0
+recive byte: ;
+recive byte: 9
+recive byte: 
+
+queue push: 30;9
+
+queue get: 30;9
+
+treadmillData speed : 30     Incline: 9
+runflag = 1
+cmdSend.command = 255
+send cmd to android: error
