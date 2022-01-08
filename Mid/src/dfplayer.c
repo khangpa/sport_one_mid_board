@@ -3,7 +3,7 @@
 #include "stdint.h"
 #include "board.h"
 #include "dfplayer.h"
-
+#include "softuart.h"
 
 #define Source      0x02  // TF CARD
 
@@ -20,7 +20,7 @@ void Send_cmd (uint8_t cmd, uint8_t Parameter1, uint8_t Parameter2)
 
 	uint8_t CmdSequence[10] = { Start_Byte, Version, Cmd_Len, cmd, Feedback, Parameter1, Parameter2, (Checksum>>8)&0x00ff, (Checksum&0x00ff), End_Byte};
 
-	UART_SendData(DF_UART,CmdSequence,10);
+	Softuart_SendData(CmdSequence,10);
 }
 
 void DF_PlayFromStart(void)
@@ -37,8 +37,9 @@ void DF_Play(uint32_t fileName)
 
 void DF_Init (uint8_t volume)
 {
-	UART_Init(DF_UART,9600, USART_Mode_Tx);
-    USART_Cmd(DF_UART,ENABLE);
+	// UART_Init(DF_UART,9600, USART_Mode_Tx);
+    // Softuart_SendData(DF_UART,ENABLE);
+	Softuart_Init(9600);
 	Send_cmd(0x3F, 0x00, Source);
 	SYSTICK_Delay_ms(200);
 	Send_cmd(0x06, 0x00, volume);
@@ -47,7 +48,7 @@ void DF_Init (uint8_t volume)
 
 void DF_DeInit()
 {
-    USART_Cmd(DF_UART,DISABLE);
+    // Softuart_SendData(DF_UART,DISABLE);
 }
 void DF_Next (void)
 {

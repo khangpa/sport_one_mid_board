@@ -40,7 +40,23 @@
 * ���:void  
 * ����:void  
 * �õ� HT1621_GPIO 4,5,6,7 �ֱ��Ӧlcd CS RD(��ʱ����) WR DAT  
-*/   
+*/
+void delay(uint32_t MS)                                         //��ʱ   
+{   
+    unsigned char us,usn;   
+    while(MS!=0)   
+    {    
+        usn = 2;   
+        while(usn!=0)   
+        {   
+            us=0xf2;   
+            while (us!=0){us--;};   
+            usn--;   
+        }   
+        MS--;   
+    }   
+};
+
 void LCD_GpioInit(void)   
 {
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
@@ -71,23 +87,15 @@ void LCD_GpioInit(void)
 *  
 */   
    
-void LCD_WriteMode(unsigned char MODE) //д��ģʽ,����or����   
+void LCD_WriteMode(unsigned char MODE)
 {   
-   GPIO_ResetBits(HT1621_GPIO_WR_DAT,HT1621_WR);                                //  RW = 0;   
-       
-    GPIO_SetBits(HT1621_GPIO_WR_DAT,HT1621_DAT);                                 //  DA = 1;   
-    GPIO_SetBits(HT1621_GPIO_WR_DAT,HT1621_WR);                                  //  RW = 1;   
-       
-       
-    GPIO_ResetBits(HT1621_GPIO_WR_DAT,HT1621_WR);                                //  RW = 0;   
-       
-    GPIO_ResetBits(HT1621_GPIO_WR_DAT,HT1621_DAT);                               //  DA = 0;   
-    GPIO_SetBits(HT1621_GPIO_WR_DAT,HT1621_WR);                                  //  RW = 1;   
-       
-       
-    GPIO_ResetBits(HT1621_GPIO_WR_DAT,HT1621_WR);                                //  RW = 0;   
-       
-   
+    GPIO_ResetBits(HT1621_GPIO_WR_DAT,HT1621_WR);                                //  RW = 0;
+    GPIO_SetBits(HT1621_GPIO_WR_DAT,HT1621_DAT);                                 //  DA = 1;
+    GPIO_SetBits(HT1621_GPIO_WR_DAT,HT1621_WR);                                  //  RW = 1;
+    GPIO_ResetBits(HT1621_GPIO_WR_DAT,HT1621_WR);                                //  RW = 0;
+    GPIO_ResetBits(HT1621_GPIO_WR_DAT,HT1621_DAT);                               //  DA = 0;
+    GPIO_SetBits(HT1621_GPIO_WR_DAT,HT1621_WR);                                  //  RW = 1;
+    GPIO_ResetBits(HT1621_GPIO_WR_DAT,HT1621_WR);                                //  RW = 0;
     if(0==MODE)   
     {   
         GPIO_ResetBits(HT1621_GPIO_WR_DAT,HT1621_DAT);                           //  DA = 0;   
@@ -95,8 +103,7 @@ void LCD_WriteMode(unsigned char MODE) //д��ģʽ,����or����
     else   
     {   
         GPIO_SetBits(HT1621_GPIO_WR_DAT,HT1621_DAT);                             //  DA = 1;   
-    }   
-       
+    }
     GPIO_SetBits(HT1621_GPIO_WR_DAT,HT1621_WR);                                  //  RW = 1;   
        
 }
@@ -177,9 +184,7 @@ void LCD_WriteData(unsigned char Dbyte)    //д����
     int i;   
     for(i=0;i<8;i++)   
     {   
-        GPIO_ResetBits(HT1621_GPIO_WR_DAT,HT1621_WR);                            //  RW = 0;   
-           
-   
+        GPIO_ResetBits(HT1621_GPIO_WR_DAT,HT1621_WR);                            //  RW = 0;
         if((Dbyte>>(7-i)) & 0x01)   
         {   
             GPIO_SetBits(HT1621_GPIO_WR_DAT,HT1621_DAT);                         //  DA = 1;   
@@ -187,52 +192,12 @@ void LCD_WriteData(unsigned char Dbyte)    //д����
         else   
         {   
             GPIO_ResetBits(HT1621_GPIO_WR_DAT,HT1621_DAT);                       //  DA = 0;   
-        }   
-           
-        GPIO_SetBits(HT1621_GPIO_WR_DAT,HT1621_WR);                              //  RW = 1;   
-           
+        }
+        GPIO_SetBits(HT1621_GPIO_WR_DAT,HT1621_WR);                              //  RW = 1;
     }   
     
 }   
-/*  
-* fq  
-* LCD ģ���ڲ�ר����ʱ����  
-* ���:ms  
-* ����:void  
-*  
-*/   
-void delay(uint32_t MS)                                         //��ʱ   
-{   
-    unsigned char us,usn;   
-    while(MS!=0)   
-    {    
-        usn = 2;   
-        while(usn!=0)   
-        {   
-            us=0xf2;   
-            while (us!=0){us--;};   
-            usn--;   
-        }   
-        MS--;   
-    }   
-}   
 
-
-//void delay(uint32_t MS,char key)                                         //��ʱ   
-//{   
-//    uint32_t mS=MS*484;
-//    while(key == NO_KEY && (mS))   
-//    {    
-//        mS--;   
-//    }   
-//}
-/*  
-* fq  
-* LCD ��ʼ������lcd��������ʼ������  
-* ���:void  
-* ����:void  
-*  
-*/   
 void LCD_Init( void )                                               //��ʼ��   
 {   
     //GPIO_SetBits(HT1621_GPIO,HT1621_CS);
@@ -277,35 +242,20 @@ void full_ram(unsigned char *puts,unsigned char n)
 * ���:puts ����ʾ���ַ���,����Ϊ7���������������򳬳�������Ч��������������룬��: "12234567"  
 * ����:void  
 *  
-*/   
-   
-
+*/
 void lcd_show_data(unsigned char *puts)   
 {   
  unsigned char i ;   
        
     GPIO_ResetBits(HT1621_GPIO_CS,HT1621_CS);                                // CS = 0;   
     LCD_WriteMode(DAT);   
-    LCD_WriteAddress(0);   
-       
+    LCD_WriteAddress(0);
     for(i=0;i<1;i++)   
     {   
         LCD_WriteData(puts[i]);
     }   
     GPIO_SetBits(HT1621_GPIO_CS,HT1621_CS);                                  //CS = 1;   
 }
-/*  
-* fq  
-* LCD ����ʵ����ʱ����  
-* ���:times  
-* ����:void  
-*  
-*/   
-void lcd_delay(int times)   
-{   
-    int i;   
-    for(i=0;i<20*times;i++) ;   
-}   
    
 /*  
 * fq  

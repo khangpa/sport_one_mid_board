@@ -8,6 +8,8 @@ static uint32_t tickcount = 0;
 void Softuart_Handtick(void)
 {
     tickcount++;
+    if(tickcount == 0xFFFFFFFF)
+      tickcount =0;
 }
 
 uint32_t Softuart_Gettick(void)
@@ -15,24 +17,24 @@ uint32_t Softuart_Gettick(void)
     return tickcount;
 }
 
-void Softuart_Config(uint32_t Baudrate)
+void Softuart_Init()
 {
     /* GPIOA Periph clock enable */
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
     /* GPIOA Config */
     GPIO_InitTypeDef GPIO_InitStructure;
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_11;
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_10;
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
-    GPIO_Init(GPIOA, &GPIO_InitStructure);
-    GPIO_ResetBits(GPIOA, GPIO_Pin_11);
+    GPIO_Init(GPIOB, &GPIO_InitStructure);
+    GPIO_ResetBits(GPIOB, GPIO_Pin_10);
     /* TIM2 Clock enabale */
     RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
     /* TIM2 Config */
     TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure;
-    TIM_TimeBaseStructure.TIM_Period = Baudrate - 1;
-    TIM_TimeBaseStructure.TIM_Prescaler = 72000000/(Baudrate*Baudrate) - 1;
-    TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV4;
+    TIM_TimeBaseStructure.TIM_Period = 2499;
+    TIM_TimeBaseStructure.TIM_Prescaler = 1;
+    TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
     TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
     TIM_TimeBaseInit(TIM2, &TIM_TimeBaseStructure);
     /* TIM IT enable */
@@ -43,8 +45,8 @@ void Softuart_Config(uint32_t Baudrate)
 
 void Softuart_SendByte(uint8_t byte)
 {
-    //setlow();
-    sethigh();
+    //GPIO_ResetBits(GPIOB, GPIO_Pin_10);
+    GPIO_SetBits(GPIOB, GPIO_Pin_10);
     uint8_t buff[8];
     for(uint8_t i = 0; i < 8; i++)
     {
@@ -59,24 +61,24 @@ void Softuart_SendByte(uint8_t byte)
     }
     tickcount = 0;
     while(Softuart_Gettick() != 1);
-    setlow();
-    //sethigh();
+    GPIO_ResetBits(GPIOB, GPIO_Pin_10);
+    //GPIO_SetBits(GPIOB, GPIO_Pin_10);
     for(uint8_t i = 0; i < 8; i++)
     {
         while (Softuart_Gettick() == i+1);
         if(buff[i] == 1)
         {
-            //setlow();
-            sethigh();
+            //GPIO_ResetBits(GPIOB, GPIO_Pin_10);
+            GPIO_SetBits(GPIOB, GPIO_Pin_10);
         }else
         {
-            setlow();
-            //sethigh();
+            GPIO_ResetBits(GPIOB, GPIO_Pin_10);
+            //GPIO_SetBits(GPIOB, GPIO_Pin_10);
         }
     }
     while (Softuart_Gettick() == 9);
-    //setlow();
-    sethigh();
+    //GPIO_ResetBits(GPIOB, GPIO_Pin_10);
+    GPIO_SetBits(GPIOB, GPIO_Pin_10);
 }
 
 void Softuart_send_frame(uint8_t startbyte, uint8_t addressbyte,
@@ -94,4 +96,10 @@ void Softuart_SendData(uint8_t* buff, uint8_t length)
     {
         Softuart_SendByte(buff[i]);
     }
+}
+
+void TIM2_IRQHandler()
+{
+    TIM_ClearFlag(TIM2,TIM_FLAG_Update);
+    Softuart_Handtick();
 }
