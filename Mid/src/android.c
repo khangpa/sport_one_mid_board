@@ -5,6 +5,7 @@
 #include "queue.h"
 #include "android.h"
 #include <string.h>
+#include <stdio.h>
 #include "stm32f10x_usart.h"
 
 #define ANDROID_BUFF_SIZE     10
@@ -23,12 +24,17 @@ static void Android_CallbackHandle()
     static uint8_t revBuff[ANDROID_CMD_MAX_SIZE];
     char revByte = 0;
     revByte = UART_GetData(ANDROID_UART);
+    #if 0
     printf("recive byte: %c\r\n", revByte);
+    #endif
     revBuff[revByteCount++] = revByte;
     if((revByteCount >= ANDROID_CMD_MAX_SIZE) || revByte == '\n')
     {
         QUEUE_Push(&AndroidCommandQueue, revBuff);
+        #if DEBUG
         printf("queue push: %s\r\n", revBuff);
+        #endif
+        //clear buffer
         memset(revBuff, '\0', ANDROID_CMD_MAX_SIZE);
         revByteCount = 0;
     }
@@ -38,7 +44,7 @@ uint32_t ANDROID_Init()
 {
 	UART_CallbackInit(ANDROID_UART, Android_CallbackHandle);
 	QUEUE_Init(&AndroidCommandQueue, (u8*)AndroidCommandBuff,\
-                ANDROID_BUFF_SIZE, sizeof(android_cmd_t));
+        ANDROID_BUFF_SIZE, sizeof(android_cmd_t));
 	UART_Init(ANDROID_UART,9600, USART_Mode_Tx|USART_Mode_Rx);
     USART_Cmd(ANDROID_UART, ENABLE);
     return 0;

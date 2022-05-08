@@ -14,6 +14,7 @@
  */
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdio.h>
 #include "keypad.h"
@@ -215,7 +216,6 @@ void android_proc()
         cmdSend = convert_android_to_power_cmd(androidCmd);
         #ifdef DEBUG
             printf("queue get: %s\r\n",androidCmd.cmd);
-            printf("treadmillData speed : %d     Incline: %d\r\n", treadmillData.speed, treadmillData.incline);
         #endif
         switch (cmdSend.command)
         {
@@ -262,6 +262,7 @@ power_com_cmd_t convert_android_to_power_cmd(android_cmd_t androidCmd)
     power_com_cmd_t cmdRet;
     cmdRet.command = 0xFF;
     char *incPtr = NULL;
+    uint32_t tempSpeed = 0;
     if(androidCmd.cmd[0] == 's')
     {
         if(androidCmd.cmd[1] == 't')
@@ -286,7 +287,11 @@ power_com_cmd_t convert_android_to_power_cmd(android_cmd_t androidCmd)
     }
     else if(run_flag == 1)
     {
-        treadmillData.speed = (uint32_t) strtoul(androidCmd.cmd, &incPtr, 10);
+        tempSpeed = (uint32_t) strtoul(androidCmd.cmd, &incPtr, 10);
+        treadmillData.speed = 10 + tempSpeed/10;
+        #if DEBUG
+        printf("speed after convert: %d\r\n", treadmillData.speed);
+        #endif
         treadmillData.incline = (uint32_t) strtoul(incPtr + 1 , (char **)NULL, 10);
         if(treadmillData.speed > 150)
             treadmillData.speed = 10;
