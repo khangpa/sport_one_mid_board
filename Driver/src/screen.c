@@ -255,7 +255,10 @@ void SCREEN_ERROR(uint32_t error)
         lcd_send_data("E",6);
         lcd_send_data("5",4);
         lcd_send_data("0",2);
+        LCD_Tone_On();
     }
+    else
+        LCD_Tone_Off();
 }
 
 /*******************************************************************************

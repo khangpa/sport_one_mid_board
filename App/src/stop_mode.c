@@ -35,7 +35,7 @@ program_state_t stop_mode(run_mechine_data_t *treadmillData, program_state_t *la
     {
         /* get speed value */
         treadmillData->speed -= 1;
-        SYSTICK_Delay_ms(100);
+        SYSTICK_Delay_ms(300);
         SCREEN_UpdateSpeed(treadmillData->speed);
     }
     reset_run_treadmillData(treadmillData);

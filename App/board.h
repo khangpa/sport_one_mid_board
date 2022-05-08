@@ -26,8 +26,7 @@
 
 /* Safe key  */
 #define SAFE_KEY_GPIO               GPIOB
-#define SAFE_KEY_PIN_OUT            GPIO_Pin_11
-#define SAFE_KEY_PIN_IN             GPIO_Pin_10
+#define SAFE_KEY_PIN                GPIO_Pin_4
 #define SAFE_KEY_TIMER              TIM2
 #define SAFE_KEY_TIMER_CLK          RCC_APB1Periph_TIM2
 #define SAFE_KEY_GPIO_CLK           RCC_APB2Periph_GPIOB

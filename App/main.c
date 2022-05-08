@@ -30,13 +30,16 @@
 #include "power_communicate.h"
 #include "stm32f10x_usart.h"
 #include "dfplayer.h"
-
+#include "fault_mode.h"
 /*******************************************************************************
 * Variable
 *******************************************************************************/
 run_mechine_data_t treadmillData;
 volatile uint8_t  WarningFlag = 0;
 volatile int sec = 3;
+
+program_state_t laststate = START;
+program_state_t state = START;
 /*******************************************************************************
  * Definition
  ******************************************************************************/
@@ -63,8 +66,6 @@ int main(void)
     TIMER3_Start();
     POWER_COM_Init();
     DF_Init(5);
-    program_state_t laststate = START;
-    program_state_t state = START;
     treadmillData.runEx = 1;
     treadmillData.speed = 0;
     treadmillData.runTime = 0;
@@ -89,6 +90,8 @@ int main(void)
             case SET_UP:
                 state = setup_mode(&treadmillData,&laststate);
                 break;
+            case FAULT:
+                state = fault_mode(&treadmillData,&laststate);
             default:
                 break;
         }

@@ -335,7 +335,9 @@
                     <state>$PROJ_DIR$\..\App</state>
                     <state>$PROJ_DIR$\..\App\inc</state>
                     <state>$PROJ_DIR$\..\Driver_St\inc</state>
-                    <state>$PROJ_DIR$\..\Driver_User\inc</state>
+                    <state>$PROJ_DIR$\..\Driver_St\src</state>
+                    <state>$PROJ_DIR$\..\Driver\inc</state>
+                    <state>$PROJ_DIR$\..\Driver\src</state>
                     <state>$PROJ_DIR$\..\Startup</state>
                     <state>$PROJ_DIR$\..\Utility</state>
                     <state>$PROJ_DIR$\..\Common</state>
@@ -2104,6 +2106,9 @@
                 <name>$PROJ_DIR$\..\App\inc\exercise_mode.h</name>
             </file>
             <file>
+                <name>$PROJ_DIR$\..\App\inc\fault_mode.h</name>
+            </file>
+            <file>
                 <name>$PROJ_DIR$\..\App\inc\run_mode.h</name>
             </file>
             <file>
@@ -2123,6 +2128,9 @@
             <name>src</name>
             <file>
                 <name>$PROJ_DIR$\..\App\src\exercise_mode.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\App\src\fault_mode.c</name>
             </file>
             <file>
                 <name>$PROJ_DIR$\..\App\src\run_mode.c</name>
@@ -2227,6 +2235,57 @@
         <file>
             <name>$PROJ_DIR$\..\Common\common.h</name>
         </file>
+    </group>
+    <group>
+        <name>Driver</name>
+        <group>
+            <name>inc</name>
+            <file>
+                <name>$PROJ_DIR$\..\Driver\inc\clock.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\Driver\inc\lcd.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\Driver\inc\screen.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\Driver\inc\softuart.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\Driver\inc\systick.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\Driver\inc\timer3.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\Driver\inc\uart.h</name>
+            </file>
+        </group>
+        <group>
+            <name>src</name>
+            <file>
+                <name>$PROJ_DIR$\..\Driver\src\clock.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\Driver\src\lcd.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\Driver\src\screen.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\Driver\src\softuart.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\Driver\src\systick.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\Driver\src\timer3.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\Driver\src\uart.c</name>
+            </file>
+        </group>
     </group>
     <group>
         <name>Driver_St</name>
@@ -2380,38 +2439,17 @@
         <group>
             <name>inc</name>
             <file>
-                <name>$PROJ_DIR$\..\Mid\inc\clock.h</name>
-            </file>
-            <file>
                 <name>$PROJ_DIR$\..\Mid\inc\dfplayer.h</name>
             </file>
             <file>
                 <name>$PROJ_DIR$\..\Mid\inc\keypad.h</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\..\Mid\inc\lcd.h</name>
-            </file>
-            <file>
                 <name>$PROJ_DIR$\..\Mid\inc\power_communicate.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\Mid\inc\screen.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\Mid\inc\systick.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\Mid\inc\timer3.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\Mid\inc\uart.h</name>
             </file>
         </group>
         <group>
             <name>src</name>
-            <file>
-                <name>$PROJ_DIR$\..\Mid\src\clock.c</name>
-            </file>
             <file>
                 <name>$PROJ_DIR$\..\Mid\src\dfplayer.c</name>
             </file>
@@ -2419,22 +2457,7 @@
                 <name>$PROJ_DIR$\..\Mid\src\keypad.c</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\..\Mid\src\lcd.c</name>
-            </file>
-            <file>
                 <name>$PROJ_DIR$\..\Mid\src\power_communicate.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\Mid\src\screen.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\Mid\src\systick.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\Mid\src\timer3.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\Mid\src\uart.c</name>
             </file>
         </group>
     </group>

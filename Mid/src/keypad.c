@@ -21,7 +21,7 @@
 /*******************************************************************************
  * Variable
  ******************************************************************************/
-keypad_state laststate = RELEAS_STATE;
+keypad_state key_laststate = RELEAS_STATE;
 const char Keypad_Button_Values[4][5] =  {  
                                             {'1', '2', '3', 'X', 'Y'},
                                             {'4', '5', '6', '7', 'Z'},
@@ -250,7 +250,7 @@ keypad_info_t KEYPAD_ScanWithCheckHold(uint32_t holdKeytimeOut)
     uint32_t t0 = SYSTICK_GetTick();
     uint32_t t1 = SYSTICK_GetTick();
     keyInfo.keyName = KEYPAD_ScanKey();
-    switch (laststate)
+    switch (key_laststate)
     {
         case HOLD_STATE:
             /* code */
@@ -282,7 +282,7 @@ keypad_info_t KEYPAD_ScanWithCheckHold(uint32_t holdKeytimeOut)
                 keyInfo.keypad_state = RELEAS_STATE;
             break;
     }
-    laststate = keyInfo.keypad_state;
+    key_laststate = keyInfo.keypad_state;
     return (keyInfo);
 }
 /*******************************************************************************

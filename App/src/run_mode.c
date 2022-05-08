@@ -8,7 +8,8 @@
 /*******************************************************************************
 * Definition
 *******************************************************************************/
-#define DEFAULT_RUN_SPEED   20
+#define DEFAULT_RUN_SPEED   10
+#define MAX_RUN_SPEED       70
 #define FLAG_OFF            0
 #define FLAG_ON             1
 typedef enum 
@@ -159,6 +160,7 @@ program_state_t run_mode(run_mechine_data_t *treadmillData, program_state_t *las
     key.keypad_state = RELEAS_STATE;
     static power_com_cmd_t cmdSend;
     /* Variable to calculate when distances and calorie values change */
+    static uint32_t displaySpeed;
     static uint32_t startTickForChangeDistance;
     static uint32_t startTickForChangeCalo;
     static uint32_t changeMoment;
@@ -186,6 +188,7 @@ program_state_t run_mode(run_mechine_data_t *treadmillData, program_state_t *las
         numberOfChange = 0;
         changeMoment = treadmillData->runTime *14/15;
         treadmillData->speed = DEFAULT_RUN_SPEED;
+        displaySpeed = DEFAULT_RUN_SPEED;
         /* send start cmd */
         POWER_COM_SendCmd(&cmdSend, cmdSend.length + 5);
         IsThisTheFirstTimeRun = NO;
@@ -244,19 +247,19 @@ program_state_t run_mode(run_mechine_data_t *treadmillData, program_state_t *las
             stateReturn = RUN;
             break;
         case SPEED_3_KEY:
-            treadmillData->speed = 30;
+            treadmillData->speed = 20;
             SCREEN_Tone();
             IsDataChanged = YES;
             stateReturn = RUN;
             break;
         case SPEED_6_KEY:
-            treadmillData->speed = 60;
+            treadmillData->speed = 35;
             SCREEN_Tone();
             IsDataChanged = YES;
             stateReturn = RUN;
             break;
         case SPEED_9_KEY:
-            treadmillData->speed = 90;
+            treadmillData->speed = 50;
             SCREEN_Tone();
             IsDataChanged = YES;
             stateReturn = RUN;
@@ -264,9 +267,14 @@ program_state_t run_mode(run_mechine_data_t *treadmillData, program_state_t *las
         case PLUS_KEY:
             if(key.keypad_state == HOLD_STATE)
                 SYSTICK_Delay_ms(DELAY_IF_HOLD_STATE);
-            treadmillData->speed += 1;
-            if(treadmillData->speed > 150)
-                treadmillData->speed = 150;
+            displaySpeed += 1;
+            if(displaySpeed % 2 == 0)
+                treadmillData->speed += 1;
+            if(treadmillData->speed > MAX_RUN_SPEED)
+            {
+                treadmillData->speed = MAX_RUN_SPEED;
+                displaySpeed = MAX_RUN_SPEED;
+            }
             else
             {
                 IsDataChanged = YES;
@@ -277,9 +285,14 @@ program_state_t run_mode(run_mechine_data_t *treadmillData, program_state_t *las
         case MINUS_KEY:
             if(key.keypad_state == HOLD_STATE)
                 SYSTICK_Delay_ms(DELAY_IF_HOLD_STATE);
-            treadmillData->speed -= 1;
-            if(treadmillData->speed < 10)
-                treadmillData->speed = 10;
+            displaySpeed -= 1;
+            if(displaySpeed % 2 == 0)
+                treadmillData->speed -= 1;
+            if(treadmillData->speed < DEFAULT_RUN_SPEED)
+            {
+                treadmillData->speed = DEFAULT_RUN_SPEED;
+                displaySpeed = DEFAULT_RUN_SPEED;
+            }
             else
             {
                 IsDataChanged = YES;
@@ -316,7 +329,7 @@ program_state_t run_mode(run_mechine_data_t *treadmillData, program_state_t *las
             stateReturn = RUN;
             break;
     }
-    
+
     /*-------------------FOR EXECISE MODE-------------------*/
     /* change speed and data if run in exercise mode */
     if(ExeRunFlag == FLAG_ON)
@@ -382,48 +395,19 @@ program_state_t run_mode(run_mechine_data_t *treadmillData, program_state_t *las
         }
 
     /* Stop if time or distance or calories expire */
-    switch (HowToCountData)
+    if(HowToCountData != COUNT_UP_ALL)
     {
-        case COUNT_DOWN_DIS:
-            if(treadmillData->distance == 0)
-            {
-                    /* stop mode */
-                    IsDataChanged           = YES;
-                    IsThisTheFirstTimeRun   = YES;
-                    HowToCountData          = COUNT_UP_ALL;
-                    ExeRunFlag              = FLAG_OFF;
-                    /* stop timer */
-                    TIMER3_STOP();
-                    stateReturn = STOP;
-            }
-            break;
-        case COUNT_DOWN_CALO:
-            if(treadmillData->calo == 0)
-            {
-                    /* stop all */
-                    IsDataChanged     = YES;
-                    IsThisTheFirstTimeRun = YES;
-                    HowToCountData    = COUNT_UP_ALL;
-                    ExeRunFlag        = FLAG_OFF;
-                    TIMER3_STOP();
-                    stateReturn = STOP;
-            }
-            break;
-        case COUNT_DOWN_TIME:
-            if(treadmillData->runTime == 0)
-            {
-                    /* stop mode */
-                    IsDataChanged     = YES;
-                    IsThisTheFirstTimeRun = YES;
-                    HowToCountData    = COUNT_UP_ALL;
-                    ExeRunFlag        = FLAG_OFF;
-                    /* stop timer */
-                    TIMER3_STOP();
-                    stateReturn = STOP;
-            }
-            break;
-        default:
-            break;
+        if((!treadmillData->distance) || (!treadmillData->calo) || (!treadmillData->runTime))
+        {
+            /* stop mode */
+            IsDataChanged           = YES;
+            IsThisTheFirstTimeRun   = YES;
+            HowToCountData          = COUNT_UP_ALL;
+            ExeRunFlag              = FLAG_OFF;
+            /* stop timer */
+            TIMER3_STOP();
+            stateReturn = STOP;
+        }
     }
     *laststate = RUN;
     return (stateReturn);
